@@ -1,322 +1,533 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#4438b8">
-<link rel="manifest" href="/manifest.json">
-<title>Remind Quiz</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#4338b8">
+<title>Remind</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#f5f3ff,#eef5ff);color:#202124}
-header{background:linear-gradient(135deg,#4438b8,#6d5dfc);color:white;padding:22px;text-align:center;font-size:30px;font-weight:800;letter-spacing:.5px;box-shadow:0 4px 18px #c9c5e8}
-.container{max-width:680px;margin:28px auto;padding:14px}
-.card{background:rgba(255,255,255,.96);padding:26px;border-radius:26px;box-shadow:0 10px 35px rgba(68,56,184,.14);border:1px solid #eee}
-h1{text-align:center;margin-top:4px;color:#4438b8}
-h2{color:#4438b8}
-.category,.option,.next,.restart{display:block;width:100%;padding:16px;margin:13px 0;border-radius:15px;font-size:17px;font-weight:600;transition:.2s}
-.category,.option{border:1px solid #e2e0ed;background:#fff;color:#303030;text-align:left;box-shadow:0 3px 10px rgba(0,0,0,.04)}
-.category:hover,.option:hover{transform:translateY(-2px);background:#f5f3ff;border-color:#bcb5ff}
-.next,.restart{border:0;background:linear-gradient(135deg,#4438b8,#6d5dfc);color:white;font-weight:700;box-shadow:0 5px 15px rgba(68,56,184,.25)}
-.next:hover,.restart:hover{transform:translateY(-2px)}
-.daily{background:linear-gradient(135deg,#ff7a00,#ff9d2e);color:white;border:0;text-align:center}
-.question{font-size:21px;font-weight:700;line-height:1.45;margin:25px 0}
-.timer{float:right;background:#f0efff;color:#4438b8;padding:9px 13px;border-radius:12px;font-weight:800}
-#result{margin-top:18px;padding:14px;border-radius:14px;background:#f5f3ff;font-size:18px;font-weight:700;text-align:center}
-.date{text-align:center;color:#777;margin-bottom:10px}
-p{line-height:1.5}
-@media(max-width:600px){header{font-size:26px;padding:18px}.container{margin:15px auto;padding:10px}.card{padding:20px;border-radius:22px}.question{font-size:19px}}
+body{margin:0;background:#f5f6fb;font-family:Arial,sans-serif;color:#17205c}
+button{font:inherit}
+.app{max-width:480px;margin:auto;min-height:100vh;background:#f5f6fb}
+.header{background:linear-gradient(135deg,#3026a8,#563be0);color:white;padding:24px 20px 28px;border-radius:0 0 26px 26px}
+.header h1{margin:0;font-size:28px}.header p{margin:5px 0 0;opacity:.85}
+.content{padding:14px}
+.card{background:white;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 3px 14px #0000000d}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:0;border-radius:16px;padding:20px 10px;min-height:135px;text-align:center;font-weight:bold;color:#17205c;background:#fff;box-shadow:0 3px 12px #00000010}
+.tile span{display:block;font-size:30px;margin-bottom:10px}.tile small{display:block;margin-top:7px;color:#69708d;font-weight:normal}
+.daily{background:#fff4dd}.weekly{background:#e8f6ff}.monthly{background:#e9fff2}.national{background:#fff1df}.international{background:#e9f0ff}.upload{background:#f0eaff}
+.primary{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,#4531ce,#663be8);color:white;font-weight:bold;margin-top:12px}
+.back{border:0;background:none;color:white;font-size:20px;margin-bottom:15px}
+.list{background:white;border-radius:16px;padding:4px 14px;box-shadow:0 3px 14px #0000000d}
+.month{display:flex;align-items:center;padding:17px 4px;border-bottom:1px solid #eee;gap:12px}
+.month:last-child{border:0}.month-icon{font-size:25px}.month b{display:block}.month small{color:#777}
+.progress{height:8px;background:#ddd;border-radius:10px;overflow:hidden;margin:8px 0 18px}.progress i{display:block;height:100%;background:#5b38df;width:10%}
+.question{font-size:19px;font-weight:bold;line-height:1.4;margin:15px 0}
+.option{width:100%;border:1px solid #dce2ed;border-radius:13px;background:white;text-align:left;padding:14px;margin:6px 0;color:#17205c;font-weight:600}
+.option.correct{background:#dcf8e9;border-color:#28b96c}.option.wrong{background:#ffe9e7;border-color:#ef7770}
+.feedback{padding:15px;border-radius:14px;background:#dcf8e9;margin-top:12px}
+.result{text-align:center;padding:25px 10px}.score{font-size:42px;font-weight:bold;color:#4b32d2}
+.uploadbox{border:2px dashed #cfd2e9;border-radius:16px;padding:35px 15px;text-align:center;background:#fafaff}
+.bottom{position:sticky;bottom:0;background:white;border-top:1px solid #eee;padding:10px;display:flex;justify-content:space-around;color:#777}
+.bottom b{color:#4230c7}
+.hidden{display:none}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
+function startSavedMonthQuiz(month,file){
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  const saved=localStorage.getItem('remind_monthly_'+month);
+
+  if(saved){
+    try{
+      const data=JSON.parse(saved);
+
+      if(data.questions && data.questions.length){
+
+        questions=data.questions.map(q=>shuffleQuestion(q));
+        category=month+' - Practice';
+        current=0;
+        score=0;
+        answered=false;
+
+        hideAll();
+        document.getElementById('quiz').classList.remove('hidden');
+        showQuestion();
+        return;
+      }
+
+    }catch(e){
+      console.error('Saved monthly quiz error:',e);
+    }
+  }
+
+  startFile(file,month+' - Practice');
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+if(typeof pdfjsLib!=="undefined"){
+  pdfjsLib.GlobalWorkerOptions.workerSrc=
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+}
+</script>
 </head>
-
 <body>
-<header>Remind</header>
+<div class="app">
 
-<div class="container">
-<div class="card">
-<div id="app"></div>
+<div id="home">
+<div class="header"><h1>Remind</h1><p>Current Affairs • Practice • Grow</p></div>
+<div class="content">
+<div class="card">🎯 <b>Your current affairs partner</b><br><small>Practice every day and improve your knowledge.</small></div>
+
+<div class="grid">
+<button class="tile daily" onclick="startFile('daily.json','Daily Practice')"><span>🔥</span>Daily Practice<small>Stay consistent</small></button>
+<button class="tile weekly" onclick="startFile('weekly.json','Weekly Practice')"><span>📅</span>Weekly Practice<small>Test your knowledge</small></button>
+<button class="tile monthly" onclick="showMonths()"><span>🗓️</span>Monthly Practice<small>Full month coverage</small></button>
+<button class="tile national" onclick="startFile('national.json','National')"><span>🇮🇳</span>National<small>India current affairs</small></button>
+<button class="tile international" onclick="startFile('international.json','International')"><span>🌍</span>International<small>World affairs</small></button>
+<button class="tile upload" onclick="showUpload()"><span>📤</span>Upload My Current Affairs<small>Image / PDF / JSON</small></button>
 </div>
+</div>
+<div class="bottom"><b>⌂ Home</b><span>▥ Progress</span><span>🔖 Bookmarks</span><span>♙ Profile</span></div>
+</div>
+
+<div id="months" class="hidden">
+<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Monthly Practice</h1></div>
+<div class="content"><div class="list" id="monthList"></div></div>
+</div>
+
+<div id="quiz" class="hidden">
+<div class="header"><button class="back" onclick="showHome()">‹</button><h1 id="quizTitle">Practice</h1></div>
+<div class="content">
+<div class="progress"><i id="bar"></i></div>
+<div id="counter"></div>
+<div class="card"><div class="question" id="question"></div><div id="options"></div><div id="feedback" class="feedback hidden"></div></div>
+<button id="next" class="primary" onclick="nextQuestion()">Next Question</button>
+</div>
+</div>
+
+<div id="result" class="hidden">
+<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Quiz Result</h1></div>
+<div class="content"><div class="card result">
+<div style="font-size:60px">🏆</div><h2>Well Done!</h2>
+<div class="score" id="finalScore"></div>
+<p id="finalText"></p>
+<button class="primary" onclick="showHome()">Back to Home</button>
+</div></div>
+</div>
+
+<div id="upload" class="hidden">
+<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Upload My Current Affairs</h1></div>
+<div class="content">
+<div class="card">
+<div class="uploadbox">
+<div style="font-size:55px">☁️</div>
+<h3>Upload MCQ File</h3>
+<p>Upload your own current-affairs MCQs and choose the month.</p>
+<select id="uploadMonth" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;margin:10px 0;color:#17205c">
+<option value="2026-07">July 2026</option>
+<option value="2026-08">August 2026</option>
+<option value="2026-09">September 2026</option>
+<option value="2026-10">October 2026</option>
+<option value="2026-11">November 2026</option>
+<option value="2026-12">December 2026</option>
+</select>
+<input id="file" type="file" accept=".pdf,.json,image/*" onchange="loadFile(event)" style="display:none">
+<button class="primary" onclick="document.getElementById('file').click()">Choose File</button>
+</div>
+</div>
+<div id="uploadInfo"></div>
+</div>
+</div>
+
 </div>
 
 <script>
+let questions=[],current=0,score=0,answered=false;
 
-const quizFiles={
-  National:'national.json',
-  International:'international.json',
-  Daily:'daily.json',
-  Weekly:'weekly.json',
-  Monthly:'monthly.json'
-};
+function hideAll(){
+['home','months','quiz','result','upload'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+}
+function showHome(){hideAll();document.getElementById('home').classList.remove('hidden')}
 
-const dailyQuizzes={
 
-"2026-10-01":[
-{q:"Which ISRO mission successfully placed EOS-05 into orbit on September 4, 2026?",o:["GSLV-F17","PSLV-C62","LVM3-M6","GSLV-F16"],a:0},
-{q:"Which country will host the inaugural ICC Women's Champions Trophy in 2027?",o:["National","Australia","England","South Africa"],a:0},
-{q:"What was National's gross GST collection in September 2026?",o:["₹1.77 lakh crore","₹2.03 lakh crore","₹1.50 lakh crore","₹2.50 lakh crore"],a:1},
-{q:"Which organization is National's national space agency?",o:["NASA","ISRO","ESA","JAXA"],a:1},
-{q:"Which planet is known as the Red Planet?",o:["Earth","Venus","Mars","Jupiter"],a:2}
-],
+function startSavedPeriodQuiz(type,period,file){
+  const key='remind_'+type+'_'+period;
+  const saved=localStorage.getItem(key);
 
-"2026-10-02":[
-{q:"Which two Nationaln cities will host the ICC Women's Champions Trophy 2027?",o:["Delhi and Mumbai","Mumbai and Vadodara","Chennai and Bengaluru","Hyderabad and Kolkata"],a:1},
-{q:"What does GDP stand for?",o:["Gross Domestic Product","Global Development Plan","General Domestic Price","Gross Development Policy"],a:0},
-{q:"Which organization is National's central bank?",o:["SBI","RBI","SEBI","NITI Aayog"],a:1},
-{q:"Which sport uses a shuttlecock?",o:["Tennis","Badminton","Hockey","Football"],a:1},
-{q:"Which is the largest ocean in the world?",o:["Atlantic Ocean","Nationaln Ocean","Pacific Ocean","Arctic Ocean"],a:2}
-],
+  if(saved){
+    try{
+      const data=JSON.parse(saved);
+      if(data.questions && data.questions.length){
+        questions=data.questions.map(q=>shuffleQuestion(q));
+        category=period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice';
+        current=0;
+        score=0;
+        answered=false;
 
-"2026-10-03":[
-{q:"Which mission was launched by ISRO on September 4, 2026?",o:["GSLV-F17 / EOS-05","PSLV-C62 / EOS-N1","GSLV-F16 / NISAR","LVM3-M6"],a:0},
-{q:"Which country will host the ICC Women's Champions Trophy 2027?",o:["National","Sri Lanka","Bangladesh","Pakistan"],a:0},
-{q:"How many players are on the field for one cricket team?",o:["9","10","11","12"],a:2},
-{q:"What gas do humans need to breathe?",o:["Oxygen","Helium","Hydrogen","Carbon dioxide"],a:0},
-{q:"What does GDP stand for?",o:["Gross Domestic Product","General Domestic Price","Global Development Plan","Gross Development Policy"],a:0}
-]
+        hideAll();
+        document.getElementById('quiz').classList.remove('hidden');
+        showQuestion();
+        return;
+      }
+    }catch(e){
+      console.error('Saved quiz error:',e);
+    }
+  }
 
-};
-
-let category="";
-let questions=[];
-let current=0;
-let score=0;
-let answered=false;
-let timer;
-let timeLeft=45;
-
-function localDate(){
-const d=new Date();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  if(file){
+    startFile(file,period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice');
+  }else{
+    alert('No quiz saved for '+period+' yet.');
+  }
 }
 
-async function startDailyQuiz(){
+function showMonths(){
+  hideAll();
+  document.getElementById('months').classList.remove('hidden');
+
+  const months=[
+    ['July 2026','2026-07'],
+    ['August 2026','2026-08'],
+    ['September 2026','2026-09'],
+    ['October 2026','2026-10'],
+    ['November 2026','2026-11'],
+    ['December 2026','2026-12']
+  ];
+
+  const list=document.getElementById('monthList');
+  list.innerHTML='';
+
+  months.forEach(function(item){
+    const div=document.createElement('div');
+    div.className='month';
+
+    let count=0;
+    try{
+      const saved=localStorage.getItem('remind_monthly_'+item[0]);
+      if(saved){
+        count=(JSON.parse(saved).questions||[]).length;
+      }
+    }catch(e){}
+
+    div.innerHTML=
+      '<span class="month-icon">🗓️</span>'+
+      '<div><b>'+item[0]+'</b>'+
+      '<small>'+count+' Saved Questions</small></div>'+
+      '<span style="margin-left:auto">›</span>';
+
+    div.onclick=function(){
+      startSavedPeriodQuiz('monthly',item[0],item[1]);
+    };
+
+    list.appendChild(div);
+  });
+}
+
+function startMonthQuiz(month,file){
+  const key='remind_monthly_'+month;
+  const saved=localStorage.getItem(key);
+
+  if(saved){
+    try{
+      const data=JSON.parse(saved);
+
+      if(data.questions && data.questions.length){
+        questions=data.questions.map(q=>shuffleQuestion(q));
+        category=month+' - Practice';
+        current=0;
+        score=0;
+        answered=false;
+
+        hideAll();
+        document.getElementById('quiz').classList.remove('hidden');
+        showQuestion();
+        return;
+      }
+    }catch(e){
+      console.error('Saved monthly quiz error:',e);
+    }
+  }
+
+  startFile(file,month+' - Practice');
+}
+
+function showUpload(){hideAll();document.getElementById('upload').classList.remove('hidden')}
+
+async function startFile(file,title){
 try{
-const response=await fetch('/daily-quiz.json?'+Date.now());
-const data=await response.json();
-
-questions=data.questions;
-category="🔥 "+data.title;
-current=0;
-score=0;
+const r=await fetch('/'+file+'?v='+Date.now());
+const d=await r.json();
+questions=(d.questions||[]).map(q=>shuffleQuestion(q));
+if(!questions.length)throw new Error('No questions');
+current=0;score=0;answered=false;
+document.getElementById('quizTitle').textContent=title;
+hideAll();document.getElementById('quiz').classList.remove('hidden');
 showQuestion();
-
-}catch(error){
-document.getElementById("app").innerHTML=
-"<h2>Daily Quiz unavailable</h2>"+
-"<p>Please try again later.</p>"+
-"<button class='restart' onclick='showCategories()'>Back</button>";
-}
+}catch(e){alert('Quiz data is not available yet.')}
 }
 
-function showCategories(){
-  document.getElementById('app').innerHTML=
-    '<h1>National Quiz</h1>'+
-    '<p>Select a category:</p>'+
-    '<button class="category" onclick="startDailyQuiz()">🔥 Daily Quiz</button>'+
-    Object.keys(quizFiles).map(c=>
-      '<button class="category" onclick="startQuiz(\''+c+'\')">📝 '+c+'</button>'
-    ).join('')+
-    '<button class="category" onclick="document.getElementById(\'quizFile\').click()">📤 Upload My Current Affairs</button>'+
-    '<input id="quizFile" type="file" accept=".json,.pdf,image/*,application/pdf" style="display:none" onchange="loadMyQuiz(event)">'+
-    '<p style="font-size:13px;margin-top:12px">Upload your own MCQ JSON file.</p>';
+function shuffleQuestion(q){
+const arr=q.o.map((text,i)=>({text,i}));
+
+while(arr.length<5){
+  arr.push({text:'None of the above',i:-1});
 }
 
-async function loadMyQuiz(event){
-  const file=event.target.files[0];
-  if(!file)return;
-
-  try{
-    let text="";
-
-    if(file.type==="application/pdf"){
-      const buffer=await file.arrayBuffer();
-      const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
-
-      for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
-        const page=await pdf.getPage(pageNo);
-        const content=await page.getTextContent();
-        text+=content.items.map(x=>x.str).join(" ")+"\\n";
-      }
-
-    }else if(file.type.startsWith("image/")){
-      const result=await Tesseract.recognize(file,"eng");
-      text=result.data.text;
-
-    }else if(file.name.toLowerCase().endsWith(".json")){
-      const data=JSON.parse(await file.text());
-      questions=data.questions||[];
-
-      if(!questions.length)throw new Error("No questions found");
-
-      category=data.title||"My Current Affairs";
-      current=0;
-      score=0;
-      showQuestion();
-      return;
-
-    }else{
-      throw new Error("Unsupported file");
-    }
-
-    const lines=text.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
-    const parsed=[];
-
-    for(let i=0;i<lines.length;i++){
-      const qm=lines[i].match(/^(?:Q(?:uestion)?[\\s.]*)?(\\d+)[.)]\\s*(.+)$/i);
-      if(!qm)continue;
-
-      const options=[];
-      let answer=null;
-
-      for(let j=i+1;j<Math.min(i+12,lines.length);j++){
-        const om=lines[j].match(/^([A-D])[.)]\\s*(.+)$/i);
-        if(om)options.push(om[2].trim());
-
-        const am=lines[j].match(/^(?:Answer|Ans)[\\s:\-]*([A-D])/i);
-        if(am)answer=am[1].toUpperCase().charCodeAt(0)-65;
-
-        if(options.length===4)break;
-      }
-
-      if(options.length===4 && answer!==null){
-        parsed.push({
-          q:qm[2].trim(),
-          o:options,
-          a:answer,
-          explanation:"Uploaded from your current-affairs file."
-        });
-      }
-    }
-
-    if(!parsed.length){
-      throw new Error("No MCQs detected");
-    }
-
-    questions=parsed;
-    category=file.name.replace(/\\.[^.]+$/,"")||"My Current Affairs";
-    current=0;
-    score=0;
-    showQuestion();
-
-  }catch(error){
-    console.error(error);
-    alert("Could not read the file. Please use a PDF/image containing MCQs with A, B, C, D options and an Answer.");
-  }
+for(let i=arr.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [arr[i],arr[j]]=[arr[j],arr[i]];
 }
 
-async function startQuiz(c){
-  try{
-    const response=await fetch('/'+quizFiles[c]+'?'+Date.now());
-    const data=await response.json();
-    questions=data.questions||[];
-    category=c;
-    current=0;
-    score=0;
-    showQuestion();
-  }catch(error){
-    document.getElementById('app').innerHTML=
-      '<h2>Quiz unavailable</h2><p>Please try again later.</p><button class="restart" onclick="showCategories()">Back</button>';
-  }
+return {...q,o:arr.map(x=>x.text),a:arr.findIndex(x=>x.i===q.a)};
 }
 
 function showQuestion(){
-
 answered=false;
-timeLeft=45;
-clearInterval(timer);
-
+document.getElementById('feedback').classList.add('hidden');
+document.getElementById('next').disabled=true;
 const q=questions[current];
-
-let html=
-"<div class='timer'>⏱️ <span id='time'>45</span>s</div>";
-
-html+="<h2>"+category+"</h2>";
-
-if(category==="🔥 Daily Quiz"){
-html+="<div class='date'>Today's Quiz: "+localDate()+"</div>";
+document.getElementById('counter').textContent=(current+1)+' / '+questions.length;
+document.getElementById('bar').style.width=((current+1)/questions.length*100)+'%';
+document.getElementById('question').textContent=q.q;
+document.getElementById('options').innerHTML=q.o.map((x,i)=>'<button class="option" onclick="answer('+i+')">'+String.fromCharCode(65+i)+'. '+x+'</button>').join('');
 }
 
-html+="<div class='question'>"+(current+1)+". "+q.q+"</div>";
-
-q.o.forEach((x,i)=>
-html+="<button class='option' onclick='checkAnswer("+i+")'>"+x+"</button>"
-);
-
-html+="<button class='next' onclick='nextQuestion()'>Next Question</button>";
-
-document.getElementById("app").innerHTML=html;
-
-timer=setInterval(()=>{
-timeLeft--;
-
-const t=document.getElementById("time");
-if(t)t.textContent=timeLeft;
-
-if(timeLeft<=0){
-clearInterval(timer);
-answered=true;
-nextQuestion();
-}
-
-},1000);
-
-}
-
-function checkAnswer(i){
-
+function answer(i){
 if(answered)return;
-
 answered=true;
-clearInterval(timer);
-
-if(i===questions[current].a){
-
-score++;
-
-document.getElementById("app")
-.insertAdjacentHTML("beforeend",
-"<div id='result'>✅ Correct!</div>");
-
-}else{
-
-document.getElementById("app")
-.insertAdjacentHTML("beforeend",
-"<div id='result'>❌ Wrong answer.</div>");
-
+const q=questions[current];
+document.querySelectorAll('.option').forEach((b,n)=>{
+b.disabled=true;
+if(n===q.a)b.classList.add('correct');
+});
+if(i===q.a){score++;document.getElementById('feedback').innerHTML='<b>✅ Correct!</b><br>'+(q.explanation||'Good answer.');}
+else{
+document.querySelectorAll('.option')[i].classList.add('wrong');
+document.getElementById('feedback').innerHTML='<b>❌ Wrong answer.</b><br>Correct answer: '+q.o[q.a]+'<br>'+(q.explanation||'');
 }
-
+document.getElementById('feedback').classList.remove('hidden');
+document.getElementById('next').disabled=false;
 }
 
 function nextQuestion(){
-  if(!answered)return;
-
-  if(current<questions.length-1){
-    current++;
-    showQuestion();
-  }else{
-    clearInterval(timer);
-
-    const percent=Math.round((score/questions.length)*100);
-    const wrong=questions.length-score;
-
-    document.getElementById('app').innerHTML=
-      '<h1>Quiz Completed!</h1>'+
-      '<h2>'+category+'</h2>'+
-      '<div class="score-card">'+
-      '<h2>🏆 '+score+' / '+questions.length+'</h2>'+
-      '<p>📊 Percentage: <b>'+percent+'%</b></p>'+
-      '<p>✅ Correct: '+score+'</p>'+
-      '<p>❌ Wrong: '+wrong+'</p>'+
-      '</div>'+
-      '<button class="restart" onclick="showCategories()">Choose Another Quiz</button>';
-  }
+if(!answered)return;
+if(current<questions.length-1){current++;showQuestion();return}
+hideAll();document.getElementById('result').classList.remove('hidden');
+const pct=Math.round(score/questions.length*100);
+document.getElementById('finalScore').textContent=score+' / '+questions.length;
+document.getElementById('finalText').textContent=pct+'% Accuracy • '+(questions.length-score)+' incorrect';
 }
 
-showCategories();
+async function loadFile(e){
+const f=e.target.files[0];
+if(!f)return;
 
-</script>
-</body>
-</html>
+document.getElementById('uploadInfo').innerHTML=
+'<div class="card"><b>⏳ Reading '+f.name+'...</b><p>Extracting MCQs...</p></div>';
+
+try{
+let text="";
+
+if(f.type==="application/pdf"){
+  const buffer=await f.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
+
+  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+    const page=await pdf.getPage(pageNo);
+    const content=await page.getTextContent();
+    text+=content.items.map(x=>x.str).join(" ")+"\n";
+  }
+}else if(f.type.startsWith("image/")){
+  const result=await Tesseract.recognize(f,"eng");
+  text=result.data.text;
+}else if(f.name.toLowerCase().endsWith(".json")){
+  const data=JSON.parse(await f.text());
+  window.uploadedQuestions=data.questions||[];
+
+  if(!window.uploadedQuestions.length)
+    throw new Error("No questions found");
+
+  
+window.uploadedMonth=document.getElementById('uploadMonth').value;
+
+localStorage.setItem(
+  'remind_monthly_'+window.uploadedMonth,
+  JSON.stringify({
+    month:window.uploadedMonth,
+    questions:window.uploadedQuestions || parsed,
+    savedAt:new Date().toISOString()
+  })
+);
+
+
+  document.getElementById('uploadInfo').innerHTML=
+  '<div class="card"><h3>✅ MCQs Found</h3>'+
+  '<p>'+window.uploadedQuestions.length+' questions detected.</p>'+
+  '<button class="primary" onclick="startUploadedQuiz()">Preview Uploaded Quiz</button></div>';
+  return;
+}else{
+  throw new Error("Unsupported file");
+}
+
+/* Normalize PDF/OCR text */
+text=text
+.replace(/\u00a0/g," ")
+.replace(/\r/g," ")
+.replace(/\n+/g," ")
+.replace(/\s+/g," ")
+.trim();
+
+const parsed=[];
+
+/*
+  Split MCQs at their Answer line.
+  This keeps numbered statements such as
+  1. ...
+  2. ...
+  3. ...
+  inside the question.
+*/
+const blocks=text.match(
+  /(?:^|\s)\d{1,4}[.)]\s+[\s\S]*?(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*[A-E]\b/gi
+) || [];
+
+for(const rawBlock of blocks){
+
+  const block=rawBlock
+    .replace(/^\s*\d{1,4}[.)]\s+/,"")
+    .trim();
+
+  const answerMatch=block.match(
+    /(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*([A-E])\b/i
+  );
+
+  if(!answerMatch)continue;
+
+  const answer=
+    answerMatch[1].toUpperCase().charCodeAt(0)-65;
+
+  const optionMatches=[
+    ...block.matchAll(
+      /(?:^|\s)([A-E])\s*[.)\-:]\s*(.*?)(?=\s+[A-E]\s*[.)\-:]\s*|\s+(?:Answer|Ans|Correct Answer)\s*[:\-]?|$)/gi
+    )
+  ];
+
+  const options=[];
+
+  for(const m of optionMatches){
+    const value=m[2].trim();
+
+    if(value && !options.includes(value)){
+      options.push(value);
+    }
+  }
+
+  if(options.length<4)continue;
+
+  while(options.length<5){
+    options.push("None of the above");
+  }
+
+  const firstOption=block.search(
+    /(?:^|\s)A\s*[.)\-:]\s*/i
+  );
+
+  if(firstOption<0)continue;
+
+  let questionText=block.slice(0,firstOption).trim();
+
+  questionText=questionText
+    .replace(/\s+/g," ")
+    .trim();
+
+  if(questionText.length<10)continue;
+
+  parsed.push({
+    q:questionText,
+    o:options.slice(0,5),
+    a:answer,
+    explanation:"Uploaded from your current-affairs PDF/image."
+  });
+}
+
+
+if(!parsed.length)
+  throw new Error("No MCQs detected");
+
+window.uploadedQuestions=parsed;
+
+window.uploadedMonth=document.getElementById('uploadMonth').value;
+
+localStorage.setItem(
+  'remind_monthly_'+window.uploadedMonth,
+  JSON.stringify({
+    month:window.uploadedMonth,
+    questions:window.uploadedQuestions || parsed,
+    savedAt:new Date().toISOString()
+  })
+);
+
+
+localStorage.setItem(
+  'remind_monthly_' + window.uploadedMonth,
+  JSON.stringify({
+    month: window.uploadedMonth,
+    questions: parsed,
+    savedAt: new Date().toISOString()
+  })
+);
+
+document.getElementById('uploadInfo').innerHTML=
+'<div class="card"><h3>✅ MCQs Found</h3>'+
+'<p><b>'+parsed.length+'</b> questions detected.</p>'+
+'<p>Month: <b>'+window.uploadedMonth+'</b></p>'+
+'<p>5 options A–E will be shuffled.</p>'+
+'<button class="primary" onclick="startUploadedQuiz()">Preview Uploaded Quiz</button></div>';
+
+}catch(err){
+console.error(err);
+
+document.getElementById('uploadInfo').innerHTML=
+'<div class="card"><h3>❌ Could not read MCQs</h3>'+
+'<p>'+err.message+'</p>'+
+'<p>Please check that the PDF/image contains MCQs with A–E options and an Answer.</p></div>';
+}
+}
+
+
+function startUploadedQuiz(){
+  if(!window.uploadedQuestions || !window.uploadedQuestions.length){
+    alert('Please upload a valid MCQ file first.');
+    return;
+  }
+
+  const type=document.getElementById('uploadType') ?
+    document.getElementById('uploadType').value : 'monthly';
+
+  const period=document.getElementById('uploadPeriod') ?
+    document.getElementById('uploadPeriod').value :
+    (window.uploadedMonth || 'October 2026');
+
+  const key='remind_'+type+'_'+period;
+
+  localStorage.setItem(key,JSON.stringify({
+    type:type,
+    period:period,
+    questions:window.uploadedQuestions,
+    savedAt:new Date().toISOString()
+  }));
+
+  questions=window.uploadedQuestions.map(q=>shuffleQuestion(q));
+  category=period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice';
+  current=0;
+  score=0;
+  answered=false;
+
+  hideAll();
+  document.getElementById('quiz').classList.remove('hidden');
+  showQuestion();
+}
+
