@@ -203,26 +203,28 @@ document.getElementById("app")
 }
 
 function nextQuestion(){
+  if(!answered)return;
 
-if(!answered)return;
+  if(current<questions.length-1){
+    current++;
+    showQuestion();
+  }else{
+    clearInterval(timer);
 
-if(current<questions.length-1){
+    const percent=Math.round((score/questions.length)*100);
+    const wrong=questions.length-score;
 
-current++;
-showQuestion();
-
-}else{
-
-clearInterval(timer);
-
-document.getElementById("app").innerHTML=
-"<h1>🎉 Quiz Completed!</h1>"+
-"<h2>"+category+"</h2>"+
-"<p>Your score: <b>"+score+" / "+questions.length+"</b></p>"+
-"<button class='restart' onclick='showCategories()'>Choose Another Quiz</button>";
-
-}
-
+    document.getElementById('app').innerHTML=
+      '<h1>Quiz Completed!</h1>'+
+      '<h2>'+category+'</h2>'+
+      '<div class="score-card">'+
+      '<h2>🏆 '+score+' / '+questions.length+'</h2>'+
+      '<p>📊 Percentage: <b>'+percent+'%</b></p>'+
+      '<p>✅ Correct: '+score+'</p>'+
+      '<p>❌ Wrong: '+wrong+'</p>'+
+      '</div>'+
+      '<button class="restart" onclick="showCategories()">Choose Another Quiz</button>';
+  }
 }
 
 showCategories();
