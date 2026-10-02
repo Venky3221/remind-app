@@ -283,7 +283,7 @@ categories = {
     ),
     "monthly.json": (
         "Monthly Current Affairs",
-        "India world major news this month"
+        "India world major news July 2026"
     )
 }
 
