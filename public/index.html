@@ -2,532 +2,700 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#4338b8">
-<title>Remind</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#4438b8">
+<title>Remind Current Affairs</title>
+
+<link rel="manifest" href="/manifest.json">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#f5f6fb;font-family:Arial,sans-serif;color:#17205c}
-button{font:inherit}
-.app{max-width:480px;margin:auto;min-height:100vh;background:#f5f6fb}
-.header{background:linear-gradient(135deg,#3026a8,#563be0);color:white;padding:24px 20px 28px;border-radius:0 0 26px 26px}
-.header h1{margin:0;font-size:28px}.header p{margin:5px 0 0;opacity:.85}
-.content{padding:14px}
-.card{background:white;border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 3px 14px #0000000d}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tile{border:0;border-radius:16px;padding:20px 10px;min-height:135px;text-align:center;font-weight:bold;color:#17205c;background:#fff;box-shadow:0 3px 12px #00000010}
-.tile span{display:block;font-size:30px;margin-bottom:10px}.tile small{display:block;margin-top:7px;color:#69708d;font-weight:normal}
-.daily{background:#fff4dd}.weekly{background:#e8f6ff}.monthly{background:#e9fff2}.national{background:#fff1df}.international{background:#e9f0ff}.upload{background:#f0eaff}
-.primary{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(135deg,#4531ce,#663be8);color:white;font-weight:bold;margin-top:12px}
-.back{border:0;background:none;color:white;font-size:20px;margin-bottom:15px}
-.list{background:white;border-radius:16px;padding:4px 14px;box-shadow:0 3px 14px #0000000d}
-.month{display:flex;align-items:center;padding:17px 4px;border-bottom:1px solid #eee;gap:12px}
-.month:last-child{border:0}.month-icon{font-size:25px}.month b{display:block}.month small{color:#777}
-.progress{height:8px;background:#ddd;border-radius:10px;overflow:hidden;margin:8px 0 18px}.progress i{display:block;height:100%;background:#5b38df;width:10%}
-.question{font-size:19px;font-weight:bold;line-height:1.4;margin:15px 0}
-.option{width:100%;border:1px solid #dce2ed;border-radius:13px;background:white;text-align:left;padding:14px;margin:6px 0;color:#17205c;font-weight:600}
-.option.correct{background:#dcf8e9;border-color:#28b96c}.option.wrong{background:#ffe9e7;border-color:#ef7770}
-.feedback{padding:15px;border-radius:14px;background:#dcf8e9;margin-top:12px}
-.result{text-align:center;padding:25px 10px}.score{font-size:42px;font-weight:bold;color:#4b32d2}
-.uploadbox{border:2px dashed #cfd2e9;border-radius:16px;padding:35px 15px;text-align:center;background:#fafaff}
-.bottom{position:sticky;bottom:0;background:white;border-top:1px solid #eee;padding:10px;display:flex;justify-content:space-around;color:#777}
-.bottom b{color:#4230c7}
-.hidden{display:none}
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
-function startSavedMonthQuiz(month,file){
-
-  const saved=localStorage.getItem('remind_monthly_'+month);
-
-  if(saved){
-    try{
-      const data=JSON.parse(saved);
-
-      if(data.questions && data.questions.length){
-
-        questions=data.questions.map(q=>shuffleQuestion(q));
-        category=month+' - Practice';
-        current=0;
-        score=0;
-        answered=false;
-
-        hideAll();
-        document.getElementById('quiz').classList.remove('hidden');
-        showQuestion();
-        return;
-      }
-
-    }catch(e){
-      console.error('Saved monthly quiz error:',e);
-    }
-  }
-
-  startFile(file,month+' - Practice');
+body{
+ margin:0;font-family:Arial,sans-serif;
+ background:#f3f5fb;color:#202124
 }
-</script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+header{
+ background:linear-gradient(135deg,#4438b8,#6755e8);
+ color:white;padding:24px 18px 28px;
+ border-radius:0 0 28px 28px;text-align:center
+}
+header h1{margin:0;font-size:30px}
+header p{margin:7px 0 0;opacity:.9}
+main{max-width:650px;margin:auto;padding:18px}
+.card{
+ background:white;border-radius:18px;padding:18px;
+ margin:12px 0;box-shadow:0 4px 18px #00000010
+}
+.menu{
+ display:flex;align-items:center;gap:14px;
+ padding:17px;margin:12px 0;background:white;
+ border-radius:17px;box-shadow:0 3px 14px #00000010;
+ cursor:pointer;touch-action:manipulation
+}
+.icon{font-size:28px;width:38px;text-align:center}
+.menu b{font-size:17px}.menu small{display:block;color:#777;margin-top:4px}
+button,select,input[type=file]{
+ width:100%;padding:14px;border:0;border-radius:12px;
+ margin-top:10px;font-size:16px
+}
+button{background:#4438b8;color:white;font-weight:bold}
+.secondary{background:#e9e7fa;color:#4438b8}
+.option{
+ background:#fff;border:2px solid #ddd;
+ padding:15px;border-radius:13px;margin:10px 0;
+ cursor:pointer;touch-action:manipulation
+}
+.option.selected{border-color:#4438b8;background:#eeeaff}
+.option.correct{border-color:#168a45;background:#e8fff0}
+.option.wrong{border-color:#d33;background:#fff0f0}
+.hidden{display:none!important}
+.progress{color:#666;font-size:14px}
+.timer{
+ text-align:center;font-size:22px;font-weight:bold;
+ background:#fff1d6;padding:10px;border-radius:12px;margin:12px 0
+}
+.score{
+ text-align:center;font-size:22px;padding:20px;
+ background:#eeeaff;border-radius:18px
+}
+.month,.period{
+ display:flex;align-items:center;gap:14px;
+ background:white;padding:17px;border-radius:16px;
+ margin:10px 0;box-shadow:0 3px 12px #0000000d;
+ cursor:pointer
+}
+.month small,.period small{display:block;color:#777;margin-top:4px}
+.month-icon{font-size:27px}
+.badge{
+ margin-left:auto;background:#eeeaff;color:#4438b8;
+ padding:5px 9px;border-radius:20px;font-size:12px
+}
+textarea{
+ width:100%;min-height:120px;padding:12px;border:1px solid #ddd;
+ border-radius:12px
+}
+label{display:block;margin-top:12px;font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>📚 Remind</h1>
+<p>Current Affairs MCQ Practice</p>
+</header>
+
+<main>
+
+<section id="home">
+<div class="card">
+<h2>Choose Practice</h2>
+<p>Practice current affairs or use your own uploaded MCQs.</p>
+</div>
+
+<div class="menu" onclick="openQuizFile('National','national.json')">
+<div class="icon">🇮🇳</div>
+<div><b>National</b><small>National Current Affairs</small></div>
+</div>
+
+<div class="menu" onclick="openQuizFile('International','international.json')">
+<div class="icon">🌍</div>
+<div><b>International</b><small>International Current Affairs</small></div>
+</div>
+
+<div class="menu" onclick="showDaily()">
+<div class="icon">📅</div>
+<div><b>Daily Practice</b><small>Daily current affairs and uploads</small></div>
+</div>
+
+<div class="menu" onclick="showWeekly()">
+<div class="icon">📆</div>
+<div><b>Weekly Practice</b><small>Weekly current affairs and uploads</small></div>
+</div>
+
+<div class="menu" onclick="showMonthly()">
+<div class="icon">🗓️</div>
+<div><b>Monthly Practice</b><small>Monthly current affairs and uploads</small></div>
+</div>
+
+<div class="menu" onclick="showUpload()">
+<div class="icon">📤</div>
+<div><b>Upload My Current Affairs</b><small>PDF, image or JSON</small></div>
+</div>
+</section>
+
+<section id="daily" class="hidden">
+<div class="card">
+<h2>📅 Daily Practice</h2>
+<div id="dailyList"></div>
+<button class="secondary" onclick="showHome()">← Back</button>
+</div>
+</section>
+
+<section id="weekly" class="hidden">
+<div class="card">
+<h2>📆 Weekly Practice</h2>
+<div id="weeklyList"></div>
+<button class="secondary" onclick="showHome()">← Back</button>
+</div>
+</section>
+
+<section id="monthly" class="hidden">
+<div class="card">
+<h2>🗓️ Monthly Practice</h2>
+<div id="monthlyList"></div>
+<button class="secondary" onclick="showHome()">← Back</button>
+</div>
+</section>
+
+<section id="upload" class="hidden">
+<div class="card">
+<h2>📤 Upload Current Affairs</h2>
+
+<label>Upload Type</label>
+<select id="uploadType" onchange="updatePeriods()">
+<option value="daily">📅 Daily</option>
+<option value="weekly">📆 Weekly</option>
+<option value="monthly">🗓️ Monthly</option>
+</select>
+
+<label>Select Period</label>
+<select id="uploadPeriod"></select>
+
+<label>Choose PDF / Image / JSON</label>
+<input id="fileInput" type="file" accept=".pdf,.json,image/*" onchange="readUpload(this)">
+
+<div id="uploadStatus"></div>
+
+<button id="saveUpload" onclick="saveUploaded()" class="hidden">
+Save MCQs
+</button>
+
+<button class="secondary" onclick="showHome()">← Back</button>
+</div>
+</section>
+
+<section id="quiz" class="hidden">
+<div class="card">
+<div class="progress" id="progress"></div>
+<div class="timer" id="timer">⏱️ 45</div>
+<button id="pauseBtn" class="secondary" onclick="togglePause()">⏸️ Pause</button>
+<h2 id="question"></h2>
+<div id="options"></div>
+<button id="next" onclick="nextQuestion()">Next</button>
+</div>
+</section>
+
+<section id="result" class="hidden">
+<div class="card">
+<h2>🎉 Quiz Completed</h2>
+<div class="score" id="resultBox"></div>
+<button onclick="showHome()">Choose Another Quiz</button>
+</div>
+</section>
+
+</main>
+
 <script>
 if(typeof pdfjsLib!=="undefined"){
-  pdfjsLib.GlobalWorkerOptions.workerSrc=
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+ pdfjsLib.GlobalWorkerOptions.workerSrc=
+ "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 }
-</script>
-</head>
-<body>
-<div class="app">
 
-<div id="home">
-<div class="header"><h1>Remind</h1><p>Current Affairs • Practice • Grow</p></div>
-<div class="content">
-<div class="card">🎯 <b>Your current affairs partner</b><br><small>Practice every day and improve your knowledge.</small></div>
+let questions=[];
+let current=0;
+let score=0;
+let answered=false;
+let timerValue=45;
+let timerHandle=null;
+let paused=false;
+let quizTitle="";
+let uploadedQuestions=[];
 
-<div class="grid">
-<button class="tile daily" onclick="startFile('daily.json','Daily Practice')"><span>🔥</span>Daily Practice<small>Stay consistent</small></button>
-<button class="tile weekly" onclick="startFile('weekly.json','Weekly Practice')"><span>📅</span>Weekly Practice<small>Test your knowledge</small></button>
-<button class="tile monthly" onclick="showMonths()"><span>🗓️</span>Monthly Practice<small>Full month coverage</small></button>
-<button class="tile national" onclick="startFile('national.json','National')"><span>🇮🇳</span>National<small>India current affairs</small></button>
-<button class="tile international" onclick="startFile('international.json','International')"><span>🌍</span>International<small>World affairs</small></button>
-<button class="tile upload" onclick="showUpload(); return false;"><span>📤</span>Upload My Current Affairs<small>Image / PDF / JSON</small></button>
-</div>
-</div>
-<div class="bottom"><b>⌂ Home</b><span>▥ Progress</span><span>🔖 Bookmarks</span><span>♙ Profile</span></div>
-</div>
-
-<div id="months" class="hidden">
-<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Monthly Practice</h1></div>
-<div class="content"><div class="list" id="monthList"></div></div>
-</div>
-
-<div id="quiz" class="hidden">
-<div class="header"><button class="back" onclick="showHome()">‹</button><h1 id="quizTitle">Practice</h1></div>
-<div class="content">
-<div class="progress"><i id="bar"></i></div>
-<div id="counter"></div>
-<div class="card"><div class="question" id="question"></div><div id="options"></div><div id="feedback" class="feedback hidden"></div></div>
-<button id="next" class="primary" onclick="nextQuestion()">Next Question</button>
-</div>
-</div>
-
-<div id="result" class="hidden">
-<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Quiz Result</h1></div>
-<div class="content"><div class="card result">
-<div style="font-size:60px">🏆</div><h2>Well Done!</h2>
-<div class="score" id="finalScore"></div>
-<p id="finalText"></p>
-<button class="primary" onclick="showHome()">Back to Home</button>
-</div></div>
-</div>
-
-<div id="upload" class="hidden">
-<div class="header"><button class="back" onclick="showHome()">‹</button><h1>Upload My Current Affairs</h1></div>
-<div class="content">
-<div class="card">
-<div class="uploadbox">
-<div style="font-size:55px">☁️</div>
-<h3>Upload MCQ File</h3>
-<p>Upload your own current-affairs MCQs and choose the month.</p>
-<select id="uploadMonth" style="width:100%;padding:14px;border:1px solid #ddd;border-radius:12px;margin:10px 0;color:#17205c">
-<option value="2026-07">July 2026</option>
-<option value="2026-08">August 2026</option>
-<option value="2026-09">September 2026</option>
-<option value="2026-10">October 2026</option>
-<option value="2026-11">November 2026</option>
-<option value="2026-12">December 2026</option>
-</select>
-<input id="file" type="file" accept=".pdf,.json,image/*" onchange="loadFile(event)" style="display:none">
-<button class="primary" onclick="document.getElementById('file').click()">Choose File</button>
-</div>
-</div>
-<div id="uploadInfo"></div>
-</div>
-</div>
-
-</div>
-
-<script>
-let questions=[],current=0,score=0,answered=false;
+const periods={
+ daily:[
+  "October 1, 2026","October 2, 2026","October 3, 2026",
+  "October 4, 2026","October 5, 2026","October 6, 2026",
+  "October 7, 2026"
+ ],
+ weekly:["Week 1","Week 2","Week 3","Week 4","Week 5"],
+ monthly:[
+  "July 2026","August 2026","September 2026",
+  "October 2026","November 2026","December 2026"
+ ]
+};
 
 function hideAll(){
-['home','months','quiz','result','upload'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+ ["home","daily","weekly","monthly","upload","quiz","result"]
+ .forEach(id=>document.getElementById(id).classList.add("hidden"));
 }
-function showHome(){hideAll();document.getElementById('home').classList.remove('hidden')}
 
+function showHome(){
+ clearInterval(timerHandle);
+ hideAll();
+ document.getElementById("home").classList.remove("hidden");
+}
 
-function startSavedPeriodQuiz(type,period,file){
-  const key='remind_'+type+'_'+period;
-  const saved=localStorage.getItem(key);
+function showDaily(){
+ hideAll();
+ document.getElementById("daily").classList.remove("hidden");
+ const box=document.getElementById("dailyList");
+ box.innerHTML="";
+ periods.daily.forEach(day=>{
+  const saved=getSaved("daily",day);
+  addPeriod(box,day,saved.length,"daily");
+ });
+}
 
-  if(saved){
-    try{
-      const data=JSON.parse(saved);
-      if(data.questions && data.questions.length){
-        questions=data.questions.map(q=>shuffleQuestion(q));
-        category=period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice';
-        current=0;
-        score=0;
-        answered=false;
+function showWeekly(){
+ hideAll();
+ document.getElementById("weekly").classList.remove("hidden");
+ const box=document.getElementById("weeklyList");
+ box.innerHTML="";
+ periods.weekly.forEach(week=>{
+  const saved=getSaved("weekly",week);
+  addPeriod(box,week,saved.length,"weekly");
+ });
+}
 
-        hideAll();
-        document.getElementById('quiz').classList.remove('hidden');
-        showQuestion();
-        return;
-      }
-    }catch(e){
-      console.error('Saved quiz error:',e);
-    }
+function showMonthly(){
+ hideAll();
+ document.getElementById("monthly").classList.remove("hidden");
+ const box=document.getElementById("monthlyList");
+ box.innerHTML="";
+ periods.monthly.forEach(month=>{
+  const saved=getSaved("monthly",month);
+  addPeriod(box,month,saved.length,"monthly");
+ });
+}
+
+function addPeriod(box,name,count,type){
+ const div=document.createElement("div");
+ div.className="period";
+ div.innerHTML=
+ '<div class="icon">'+
+ (type==="daily"?"📅":type==="weekly"?"📆":"🗓️")+
+ '</div><div><b>'+name+'</b><small>'+
+ (count?count+" saved MCQs":"No uploaded MCQs yet")+
+ '</small></div>'+
+ '<span class="badge">'+(count||"")+'</span>';
+
+ div.onclick=function(){
+  openPeriod(type,name);
+ };
+ box.appendChild(div);
+}
+
+function getSaved(type,period){
+ try{
+  const x=localStorage.getItem("remind_"+type+"_"+period);
+  if(!x)return [];
+  const d=JSON.parse(x);
+  return Array.isArray(d.questions)?d.questions:[];
+ }catch(e){return []}
+}
+
+async function openPeriod(type,period){
+ const saved=getSaved(type,period);
+
+ if(saved.length){
+  startQuiz(saved,type.toUpperCase()+" • "+period);
+  return;
+ }
+
+ const files={
+  daily:"daily.json",
+  weekly:"weekly.json",
+  monthly:"monthly.json"
+ };
+
+ openQuizFile(type.toUpperCase()+" • "+period,files[type]);
+}
+
+async function openQuizFile(title,file){
+ try{
+  const r=await fetch("/"+file+"?v="+Date.now());
+  if(!r.ok)throw new Error("file");
+  const data=await r.json();
+
+  if(!data.questions || !data.questions.length){
+   alert("No MCQs are available for this section yet.");
+   return;
   }
 
-  if(file){
-    startFile(file,period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice');
-  }else{
-    alert('No quiz saved for '+period+' yet.');
-  }
+  startQuiz(data.questions,title);
+ }catch(e){
+  alert("Quiz is not available yet.");
+ }
 }
 
-function showMonths(){
-  hideAll();
-  document.getElementById('months').classList.remove('hidden');
+function normalizeQuestion(q){
+ if(q.q && Array.isArray(q.o) && typeof q.a==="number"){
+  return {
+   q:String(q.q),
+   o:q.o.slice(0,5).map(String),
+   a:q.a,
+   explanation:q.explanation||""
+  };
+ }
 
-  const months=[
-    ['July 2026','2026-07'],
-    ['August 2026','2026-08'],
-    ['September 2026','2026-09'],
-    ['October 2026','2026-10'],
-    ['November 2026','2026-11'],
-    ['December 2026','2026-12']
-  ];
-
-  const list=document.getElementById('monthList');
-  list.innerHTML='';
-
-  months.forEach(function(item){
-    const div=document.createElement('div');
-    div.className='month';
-
-    let count=0;
-    try{
-      const saved=localStorage.getItem('remind_monthly_'+item[0]);
-      if(saved){
-        count=(JSON.parse(saved).questions||[]).length;
-      }
-    }catch(e){}
-
-    div.innerHTML=
-      '<span class="month-icon">🗓️</span>'+
-      '<div><b>'+item[0]+'</b>'+
-      '<small>'+count+' Saved Questions</small></div>'+
-      '<span style="margin-left:auto">›</span>';
-
-    div.onclick=function(){
-      startSavedPeriodQuiz('monthly',item[0],item[1]);
-    };
-
-    list.appendChild(div);
-  });
-}
-
-function startMonthQuiz(month,file){
-  const key='remind_monthly_'+month;
-  const saved=localStorage.getItem(key);
-
-  if(saved){
-    try{
-      const data=JSON.parse(saved);
-
-      if(data.questions && data.questions.length){
-        questions=data.questions.map(q=>shuffleQuestion(q));
-        category=month+' - Practice';
-        current=0;
-        score=0;
-        answered=false;
-
-        hideAll();
-        document.getElementById('quiz').classList.remove('hidden');
-        showQuestion();
-        return;
-      }
-    }catch(e){
-      console.error('Saved monthly quiz error:',e);
-    }
+ if(q.question && Array.isArray(q.options)){
+  let a=Number(q.answer);
+  if(Number.isNaN(a)){
+   const letter=String(q.answer||"A").trim().toUpperCase();
+   a=Math.max(0,Math.min(4,letter.charCodeAt(0)-65));
   }
 
-  startFile(file,month+' - Practice');
-}
+  return {
+   q:String(q.question),
+   o:q.options.slice(0,5).map(String),
+   a:a,
+   explanation:q.explanation||""
+  };
+ }
 
-function showUpload(){hideAll();document.getElementById('upload').classList.remove('hidden')}
-
-async function startFile(file,title){
-try{
-const r=await fetch('/'+file+'?v='+Date.now());
-const d=await r.json();
-questions=(d.questions||[]).map(q=>shuffleQuestion(q));
-if(!questions.length)throw new Error('No questions');
-current=0;score=0;answered=false;
-document.getElementById('quizTitle').textContent=title;
-hideAll();document.getElementById('quiz').classList.remove('hidden');
-showQuestion();
-}catch(e){alert('Quiz data is not available yet.')}
+ return null;
 }
 
 function shuffleQuestion(q){
-const arr=q.o.map((text,i)=>({text,i}));
+ let options=q.o.map((text,index)=>({text,index}));
 
-while(arr.length<5){
-  arr.push({text:'None of the above',i:-1});
-}
+ while(options.length<5){
+  options.push({text:"None of the above",index:-1});
+ }
 
-for(let i=arr.length-1;i>0;i--){
+ for(let i=options.length-1;i>0;i--){
   const j=Math.floor(Math.random()*(i+1));
-  [arr[i],arr[j]]=[arr[j],arr[i]];
+  [options[i],options[j]]=[options[j],options[i]];
+ }
+
+ return {
+  q:q.q,
+  o:options.map(x=>x.text),
+  a:options.findIndex(x=>x.index===q.a),
+  explanation:q.explanation||""
+ };
 }
 
-return {...q,o:arr.map(x=>x.text),a:arr.findIndex(x=>x.i===q.a)};
+function startQuiz(list,title){
+ questions=list.map(normalizeQuestion).filter(Boolean);
+
+ if(!questions.length){
+  alert("No valid MCQs found.");
+  return;
+ }
+
+ questions=questions.map(shuffleQuestion);
+
+ if(questions.length>100){
+  questions=questions
+   .sort(()=>Math.random()-0.5)
+   .slice(0,100);
+ }
+
+ quizTitle=title;
+ current=0;
+ score=0;
+ answered=false;
+
+ hideAll();
+ document.getElementById("quiz").classList.remove("hidden");
+ showQuestion();
 }
 
 function showQuestion(){
-answered=false;
-document.getElementById('feedback').classList.add('hidden');
-document.getElementById('next').disabled=true;
-const q=questions[current];
-document.getElementById('counter').textContent=(current+1)+' / '+questions.length;
-document.getElementById('bar').style.width=((current+1)/questions.length*100)+'%';
-document.getElementById('question').textContent=q.q;
-document.getElementById('options').innerHTML=q.o.map((x,i)=>'<button class="option" onclick="answer('+i+')">'+String.fromCharCode(65+i)+'. '+x+'</button>').join('');
+ clearInterval(timerHandle);
+
+ if(current>=questions.length){
+  finishQuiz();
+  return;
+ }
+
+ answered=false;
+ paused=false;
+ timerValue=45;
+
+ document.getElementById("pauseBtn").textContent="⏸️ Pause";
+
+ document.getElementById("progress").textContent=
+ "Question "+(current+1)+" / "+questions.length;
+
+ document.getElementById("timer").textContent="⏱️ 45";
+ document.getElementById("question").textContent=questions[current].q;
+
+ const box=document.getElementById("options");
+ box.innerHTML="";
+
+ questions[current].o.forEach((text,i)=>{
+  const div=document.createElement("div");
+  div.className="option";
+  div.textContent=(String.fromCharCode(65+i))+". "+text;
+
+  div.onclick=function(){
+   if(answered)return;
+
+   answered=true;
+
+   [...box.children].forEach((x,n)=>{
+    x.classList.remove("selected");
+    if(n===questions[current].a)x.classList.add("correct");
+   });
+
+   if(i===questions[current].a){
+    div.classList.add("correct");
+    score++;
+   }else{
+    div.classList.add("wrong");
+   }
+  };
+
+  box.appendChild(div);
+ });
+
+ timerHandle=setInterval(()=>{
+  if(paused)return;
+
+  timerValue--;
+  document.getElementById("timer").textContent="⏱️ "+timerValue;
+
+  if(timerValue<=0){
+   clearInterval(timerHandle);
+   if(!answered){
+    answered=true;
+    [...box.children].forEach((x,n)=>{
+     if(n===questions[current].a)x.classList.add("correct");
+    });
+   }
+  }
+ },1000);
 }
 
-function answer(i){
-if(answered)return;
-answered=true;
-const q=questions[current];
-document.querySelectorAll('.option').forEach((b,n)=>{
-b.disabled=true;
-if(n===q.a)b.classList.add('correct');
-});
-if(i===q.a){score++;document.getElementById('feedback').innerHTML='<b>✅ Correct!</b><br>'+(q.explanation||'Good answer.');}
-else{
-document.querySelectorAll('.option')[i].classList.add('wrong');
-document.getElementById('feedback').innerHTML='<b>❌ Wrong answer.</b><br>Correct answer: '+q.o[q.a]+'<br>'+(q.explanation||'');
-}
-document.getElementById('feedback').classList.remove('hidden');
-document.getElementById('next').disabled=false;
+function togglePause(){
+ if(answered)return;
+
+ paused=!paused;
+
+ const btn=document.getElementById("pauseBtn");
+
+ if(paused){
+  btn.textContent="▶️ Resume";
+  document.getElementById("timer").textContent="⏸️ "+timerValue;
+ }else{
+  btn.textContent="⏸️ Pause";
+  document.getElementById("timer").textContent="⏱️ "+timerValue;
+ }
 }
 
 function nextQuestion(){
-if(!answered)return;
-if(current<questions.length-1){current++;showQuestion();return}
-hideAll();document.getElementById('result').classList.remove('hidden');
-const pct=Math.round(score/questions.length*100);
-document.getElementById('finalScore').textContent=score+' / '+questions.length;
-document.getElementById('finalText').textContent=pct+'% Accuracy • '+(questions.length-score)+' incorrect';
-}
-
-async function loadFile(e){
-const f=e.target.files[0];
-if(!f)return;
-
-document.getElementById('uploadInfo').innerHTML=
-'<div class="card"><b>⏳ Reading '+f.name+'...</b><p>Extracting MCQs...</p></div>';
-
-try{
-let text="";
-
-if(f.type==="application/pdf"){
-  const buffer=await f.arrayBuffer();
-  const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
-
-  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
-    const page=await pdf.getPage(pageNo);
-    const content=await page.getTextContent();
-    text+=content.items.map(x=>x.str).join(" ")+"\n";
-  }
-}else if(f.type.startsWith("image/")){
-  const result=await Tesseract.recognize(f,"eng");
-  text=result.data.text;
-}else if(f.name.toLowerCase().endsWith(".json")){
-  const data=JSON.parse(await f.text());
-  window.uploadedQuestions=data.questions||[];
-
-  if(!window.uploadedQuestions.length)
-    throw new Error("No questions found");
-
-  
-window.uploadedMonth=document.getElementById('uploadMonth').value;
-
-localStorage.setItem(
-  'remind_monthly_'+window.uploadedMonth,
-  JSON.stringify({
-    month:window.uploadedMonth,
-    questions:window.uploadedQuestions || parsed,
-    savedAt:new Date().toISOString()
-  })
-);
-
-
-  document.getElementById('uploadInfo').innerHTML=
-  '<div class="card"><h3>✅ MCQs Found</h3>'+
-  '<p>'+window.uploadedQuestions.length+' questions detected.</p>'+
-  '<button class="primary" onclick="startUploadedQuiz()">Preview Uploaded Quiz</button></div>';
+ if(!answered){
+  alert("Please select an answer.");
   return;
-}else{
-  throw new Error("Unsupported file");
+ }
+
+ if(current<questions.length-1){
+  current++;
+  showQuestion();
+ }else{
+  finishQuiz();
+ }
 }
 
-/* Normalize PDF/OCR text */
-text=text
-.replace(/\u00a0/g," ")
-.replace(/\r/g," ")
-.replace(/\n+/g," ")
-.replace(/\s+/g," ")
-.trim();
+function finishQuiz(){
+ clearInterval(timerHandle);
 
-const parsed=[];
+ const total=questions.length;
+ const wrong=total-score;
+ const percent=Math.round(score/total*100);
 
-/*
-  Split MCQs at their Answer line.
-  This keeps numbered statements such as
-  1. ...
-  2. ...
-  3. ...
-  inside the question.
-*/
-const blocks=text.match(
-  /(?:^|\s)\d{1,4}[.)]\s+[\s\S]*?(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*[A-E]\b/gi
-) || [];
+ hideAll();
+ document.getElementById("result").classList.remove("hidden");
 
-for(const rawBlock of blocks){
+ document.getElementById("resultBox").innerHTML=
+ "<b>"+quizTitle+"</b><br><br>"+
+ "🏆 "+score+" / "+total+"<br><br>"+
+ "📊 "+percent+"%<br>"+
+ "✅ Correct: "+score+"<br>"+
+ "❌ Wrong: "+wrong;
+}
 
-  const block=rawBlock
-    .replace(/^\s*\d{1,4}[.)]\s+/,"")
-    .trim();
+function showUpload(){
+ hideAll();
+ document.getElementById("upload").classList.remove("hidden");
+ updatePeriods();
+}
 
-  const answerMatch=block.match(
-    /(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*([A-E])\b/i
+function updatePeriods(){
+ const type=document.getElementById("uploadType").value;
+ const select=document.getElementById("uploadPeriod");
+
+ select.innerHTML="";
+ periods[type].forEach(x=>{
+  const option=document.createElement("option");
+  option.value=x;
+  option.textContent=x;
+  select.appendChild(option);
+ });
+}
+
+async function readUpload(input){
+ const file=input.files[0];
+ if(!file)return;
+
+ uploadedQuestions=[];
+
+ document.getElementById("uploadStatus").innerHTML=
+ "<p>⏳ Reading "+file.name+"...</p>";
+
+ try{
+  if(file.name.toLowerCase().endsWith(".json")){
+   const text=await file.text();
+   const data=JSON.parse(text);
+   const list=Array.isArray(data)?data:(data.questions||[]);
+   uploadedQuestions=list.map(normalizeQuestion).filter(Boolean);
+  }
+  else if(file.type==="application/pdf" ||
+          file.name.toLowerCase().endsWith(".pdf")){
+   uploadedQuestions=await readPDF(file);
+  }
+  else if(file.type.startsWith("image/")){
+   uploadedQuestions=await readImage(file);
+  }
+
+  if(!uploadedQuestions.length){
+   throw new Error("No MCQs");
+  }
+
+  document.getElementById("uploadStatus").innerHTML=
+   "<p>✅ Found <b>"+uploadedQuestions.length+
+   "</b> MCQs.</p>";
+
+  document.getElementById("saveUpload").classList.remove("hidden");
+
+ }catch(e){
+  console.error(e);
+  document.getElementById("uploadStatus").innerHTML=
+   "<p>❌ Could not find valid MCQs. The file should contain questions, options A-E, and the correct answer.</p>";
+ }
+}
+
+async function readPDF(file){
+ const buffer=await file.arrayBuffer();
+ const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
+ let text="";
+
+ for(let p=1;p<=pdf.numPages;p++){
+  const page=await pdf.getPage(p);
+  const content=await page.getTextContent();
+
+  text+=" "+content.items.map(x=>x.str).join(" ");
+ }
+
+ return parseMCQText(text);
+}
+
+async function readImage(file){
+ const result=await Tesseract.recognize(file,"eng");
+ return parseMCQText(result.data.text);
+}
+
+function parseMCQText(text){
+ text=text
+ .replace(/\u00a0/g," ")
+ .replace(/\r/g," ")
+ .replace(/\n+/g," ")
+ .replace(/\s+/g," ")
+ .trim();
+
+ const blocks=text.match(
+ /(?:^|\s)\d{1,4}[.)]\s+[\s\S]*?(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*[A-E]\b/gi
+ )||[];
+
+ const result=[];
+
+ for(const raw of blocks){
+  const block=raw
+   .replace(/^\s*\d{1,4}[.)]\s+/,"")
+   .trim();
+
+  const am=block.match(
+   /(?:Answer|Ans|Correct Answer)\s*[:\-]?\s*([A-E])\b/i
   );
 
-  if(!answerMatch)continue;
+  if(!am)continue;
 
-  const answer=
-    answerMatch[1].toUpperCase().charCodeAt(0)-65;
+  const answer=am[1].toUpperCase().charCodeAt(0)-65;
 
-  const optionMatches=[
-    ...block.matchAll(
-      /(?:^|\s)([A-E])\s*[.)\-:]\s*(.*?)(?=\s+[A-E]\s*[.)\-:]\s*|\s+(?:Answer|Ans|Correct Answer)\s*[:\-]?|$)/gi
-    )
-  ];
+  const matches=[...block.matchAll(
+   /(?:^|\s)([A-E])\s*[.)\-:]\s*(.*?)(?=\s+[A-E]\s*[.)\-:]\s*|\s+(?:Answer|Ans|Correct Answer)\s*[:\-]?|$)/gi
+  )];
 
   const options=[];
 
-  for(const m of optionMatches){
-    const value=m[2].trim();
-
-    if(value && !options.includes(value)){
-      options.push(value);
-    }
-  }
+  matches.forEach(m=>{
+   const value=m[2].trim();
+   if(value && !options.includes(value))options.push(value);
+  });
 
   if(options.length<4)continue;
 
-  while(options.length<5){
-    options.push("None of the above");
-  }
+  const first=block.search(/(?:^|\s)A\s*[.)\-:]\s*/i);
+  if(first<0)continue;
 
-  const firstOption=block.search(
-    /(?:^|\s)A\s*[.)\-:]\s*/i
-  );
+  let q=block.slice(0,first).trim();
+  q=q.replace(/\s+/g," ");
 
-  if(firstOption<0)continue;
+  if(q.length<10)continue;
 
-  let questionText=block.slice(0,firstOption).trim();
+  while(options.length<5)
+   options.push("None of the above");
 
-  questionText=questionText
-    .replace(/\s+/g," ")
-    .trim();
-
-  if(questionText.length<10)continue;
-
-  parsed.push({
-    q:questionText,
-    o:options.slice(0,5),
-    a:answer,
-    explanation:"Uploaded from your current-affairs PDF/image."
+  result.push({
+   q:q,
+   o:options.slice(0,5),
+   a:answer,
+   explanation:"Uploaded current affairs MCQ"
   });
+ }
+
+ return result;
 }
 
+function saveUploaded(){
+ if(!uploadedQuestions.length){
+  alert("No MCQs to save.");
+  return;
+ }
 
-if(!parsed.length)
-  throw new Error("No MCQs detected");
+ const type=document.getElementById("uploadType").value;
+ const period=document.getElementById("uploadPeriod").value;
 
-window.uploadedQuestions=parsed;
+ const key="remind_"+type+"_"+period;
 
-window.uploadedMonth=document.getElementById('uploadMonth').value;
+ localStorage.setItem(key,JSON.stringify({
+  type:type,
+  period:period,
+  questions:uploadedQuestions,
+  savedAt:new Date().toISOString()
+ }));
 
-localStorage.setItem(
-  'remind_monthly_'+window.uploadedMonth,
-  JSON.stringify({
-    month:window.uploadedMonth,
-    questions:window.uploadedQuestions || parsed,
-    savedAt:new Date().toISOString()
-  })
-);
+ document.getElementById("uploadStatus").innerHTML=
+ "<p>✅ Saved <b>"+uploadedQuestions.length+
+ "</b> MCQs to <b>"+period+"</b>.</p>";
 
+ document.getElementById("saveUpload").classList.add("hidden");
 
-localStorage.setItem(
-  'remind_monthly_' + window.uploadedMonth,
-  JSON.stringify({
-    month: window.uploadedMonth,
-    questions: parsed,
-    savedAt: new Date().toISOString()
-  })
-);
-
-document.getElementById('uploadInfo').innerHTML=
-'<div class="card"><h3>✅ MCQs Found</h3>'+
-'<p><b>'+parsed.length+'</b> questions detected.</p>'+
-'<p>Month: <b>'+window.uploadedMonth+'</b></p>'+
-'<p>5 options A–E will be shuffled.</p>'+
-'<button class="primary" onclick="startUploadedQuiz()">Preview Uploaded Quiz</button></div>';
-
-}catch(err){
-console.error(err);
-
-document.getElementById('uploadInfo').innerHTML=
-'<div class="card"><h3>❌ Could not read MCQs</h3>'+
-'<p>'+err.message+'</p>'+
-'<p>Please check that the PDF/image contains MCQs with A–E options and an Answer.</p></div>';
-}
+ setTimeout(function(){
+  if(type==="daily")showDaily();
+  else if(type==="weekly")showWeekly();
+  else showMonthly();
+ },700);
 }
 
+updatePeriods();
+</script>
 
-function startUploadedQuiz(){
-  if(!window.uploadedQuestions || !window.uploadedQuestions.length){
-    alert('Please upload a valid MCQ file first.');
-    return;
-  }
-
-  const type=document.getElementById('uploadType') ?
-    document.getElementById('uploadType').value : 'monthly';
-
-  const period=document.getElementById('uploadPeriod') ?
-    document.getElementById('uploadPeriod').value :
-    (window.uploadedMonth || 'October 2026');
-
-  const key='remind_'+type+'_'+period;
-
-  localStorage.setItem(key,JSON.stringify({
-    type:type,
-    period:period,
-    questions:window.uploadedQuestions,
-    savedAt:new Date().toISOString()
-  }));
-
-  questions=window.uploadedQuestions.map(q=>shuffleQuestion(q));
-  category=period+' - '+type.charAt(0).toUpperCase()+type.slice(1)+' Practice';
-  current=0;
-  score=0;
-  answered=false;
-
-  hideAll();
-  document.getElementById('quiz').classList.remove('hidden');
-  showQuestion();
-}
-
+</body>
+</html>
