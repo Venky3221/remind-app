@@ -27,6 +27,9 @@ h2{color:#4438b8}
 p{line-height:1.5}
 @media(max-width:600px){header{font-size:26px;padding:18px}.container{margin:15px auto;padding:10px}.card{padding:20px;border-radius:22px}.question{font-size:19px}}
 </style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 
 <body>
@@ -117,7 +120,7 @@ function showCategories(){
       '<button class="category" onclick="startQuiz(\''+c+'\')">📝 '+c+'</button>'
     ).join('')+
     '<button class="category" onclick="document.getElementById(\'quizFile\').click()">📤 Upload My Current Affairs</button>'+
-    '<input id="quizFile" type="file" accept=".json,application/json" style="display:none" onchange="loadMyQuiz(event)">'+
+    '<input id="quizFile" type="file" accept=".json,.pdf,image/*,application/pdf" style="display:none" onchange="loadMyQuiz(event)">'+
     '<p style="font-size:13px;margin-top:12px">Upload your own MCQ JSON file.</p>';
 }
 
@@ -126,21 +129,81 @@ async function loadMyQuiz(event){
   if(!file)return;
 
   try{
-    const text=await file.text();
-    const data=JSON.parse(text);
+    let text="";
 
-    if(!Array.isArray(data.questions) || data.questions.length===0){
-      throw new Error('No questions found');
+    if(file.type==="application/pdf"){
+      const buffer=await file.arrayBuffer();
+      const pdf=await pdfjsLib.getDocument({data:buffer}).promise;
+
+      for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+        const page=await pdf.getPage(pageNo);
+        const content=await page.getTextContent();
+        text+=content.items.map(x=>x.str).join(" ")+"\\n";
+      }
+
+    }else if(file.type.startsWith("image/")){
+      const result=await Tesseract.recognize(file,"eng");
+      text=result.data.text;
+
+    }else if(file.name.toLowerCase().endsWith(".json")){
+      const data=JSON.parse(await file.text());
+      questions=data.questions||[];
+
+      if(!questions.length)throw new Error("No questions found");
+
+      category=data.title||"My Current Affairs";
+      current=0;
+      score=0;
+      showQuestion();
+      return;
+
+    }else{
+      throw new Error("Unsupported file");
     }
 
-    questions=data.questions;
-    category=data.title || 'My Current Affairs';
+    const lines=text.split(/\\r?\\n/).map(x=>x.trim()).filter(Boolean);
+    const parsed=[];
+
+    for(let i=0;i<lines.length;i++){
+      const qm=lines[i].match(/^(?:Q(?:uestion)?[\\s.]*)?(\\d+)[.)]\\s*(.+)$/i);
+      if(!qm)continue;
+
+      const options=[];
+      let answer=null;
+
+      for(let j=i+1;j<Math.min(i+12,lines.length);j++){
+        const om=lines[j].match(/^([A-D])[.)]\\s*(.+)$/i);
+        if(om)options.push(om[2].trim());
+
+        const am=lines[j].match(/^(?:Answer|Ans)[\\s:\-]*([A-D])/i);
+        if(am)answer=am[1].toUpperCase().charCodeAt(0)-65;
+
+        if(options.length===4)break;
+      }
+
+      if(options.length===4 && answer!==null){
+        parsed.push({
+          q:qm[2].trim(),
+          o:options,
+          a:answer,
+          explanation:"Uploaded from your current-affairs file."
+        });
+      }
+    }
+
+    if(!parsed.length){
+      throw new Error("No MCQs detected");
+    }
+
+    questions=parsed;
+    category=file.name.replace(/\\.[^.]+$/,"")||"My Current Affairs";
     current=0;
     score=0;
     showQuestion();
 
   }catch(error){
-    alert('Invalid quiz file. Please use the correct JSON format.');
+    console.error(error);
+    alert("Could not read the file. Please use a PDF/image containing MCQs with A, B, C, D options and an Answer.");
   }
 }
 
