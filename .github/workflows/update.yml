@@ -1,0 +1,42 @@
+name: Update Current Affairs
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update quiz data
+        run: |
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone
+
+          today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+          files = ["national.json", "international.json", "daily.json", "weekly.json", "monthly.json"]
+
+          for name in files:
+              path = "public/" + name
+              with open(path) as f:
+                  data = json.load(f)
+
+              data["updated"] = today
+
+              with open(path, "w") as f:
+                  json.dump(data, f, indent=2)
+
+          print("Updated:", today)
+          PY
+
+      - name: Deploy to Firebase Hosting
+        run: |
+          npm install -g firebase-tools
+          firebase deploy --only hosting --project remind-2c57c
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
