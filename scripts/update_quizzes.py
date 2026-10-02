@@ -240,7 +240,7 @@ Articles:
             "source": source
         })
 
-    if len(valid) < 5:
+    if len(valid) < 10:
         raise RuntimeError(
             f"Gemini returned only {len(valid)} valid questions"
         )
