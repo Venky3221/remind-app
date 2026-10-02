@@ -109,14 +109,39 @@ document.getElementById("app").innerHTML=
 }
 
 function showCategories(){
+  document.getElementById('app').innerHTML=
+    '<h1>National Quiz</h1>'+
+    '<p>Select a category:</p>'+
+    '<button class="category" onclick="startDailyQuiz()">🔥 Daily Quiz</button>'+
+    Object.keys(quizFiles).map(c=>
+      '<button class="category" onclick="startQuiz(\''+c+'\')">📝 '+c+'</button>'
+    ).join('')+
+    '<button class="category" onclick="document.getElementById(\'quizFile\').click()">📤 Upload My Current Affairs</button>'+
+    '<input id="quizFile" type="file" accept=".json,application/json" style="display:none" onchange="loadMyQuiz(event)">'+
+    '<p style="font-size:13px;margin-top:12px">Upload your own MCQ JSON file.</p>';
+}
 
-document.getElementById("app").innerHTML=
-"<h1>National Quiz</h1>"+
-"<p>Select a category:</p>"+
-"<button class='category daily' onclick='startDailyQuiz()'>🔥 Daily Quiz</button>"+
-Object.keys(quizFiles).map(c=>
-"<button class='category' onclick=\"startQuiz('"+c+"')\">📚 "+c+"</button>"
-).join("");
+async function loadMyQuiz(event){
+  const file=event.target.files[0];
+  if(!file)return;
+
+  try{
+    const text=await file.text();
+    const data=JSON.parse(text);
+
+    if(!Array.isArray(data.questions) || data.questions.length===0){
+      throw new Error('No questions found');
+    }
+
+    questions=data.questions;
+    category=data.title || 'My Current Affairs';
+    current=0;
+    score=0;
+    showQuestion();
+
+  }catch(error){
+    alert('Invalid quiz file. Please use the correct JSON format.');
+  }
 }
 
 async function startQuiz(c){
