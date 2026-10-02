@@ -1,0 +1,55 @@
+{
+  "title": "Weekly Current Affairs",
+  "questions": [
+    {
+      "q": "Which Indian startup was preparing to launch MOI-1A on a SpaceX rideshare mission?",
+      "o": [
+        "TakeMe2Space",
+        "Skyroot Aerospace",
+        "Pixxel",
+        "Agnikul Cosmos"
+      ],
+      "a": 0
+    },
+    {
+      "q": "India's gross GST collection in September 2026 crossed which milestone?",
+      "o": [
+        "\u20b91 lakh crore",
+        "\u20b91.5 lakh crore",
+        "\u20b92 lakh crore",
+        "\u20b93 lakh crore"
+      ],
+      "a": 2
+    },
+    {
+      "q": "Which Indian state led state-wise GST collections in September 2026?",
+      "o": [
+        "Maharashtra",
+        "Karnataka",
+        "Gujarat",
+        "Tamil Nadu"
+      ],
+      "a": 0
+    },
+    {
+      "q": "India's September 2026 Manufacturing PMI was compared with August's reading of:",
+      "o": [
+        "50.1",
+        "51.6",
+        "52.8",
+        "54.6"
+      ],
+      "a": 2
+    },
+    {
+      "q": "MOI-1A is designed to perform computing and data processing where?",
+      "o": [
+        "On the satellite in orbit",
+        "Only in a ground data centre",
+        "Under the ocean",
+        "Inside aircraft"
+      ],
+      "a": 0
+    }
+  ]
+}

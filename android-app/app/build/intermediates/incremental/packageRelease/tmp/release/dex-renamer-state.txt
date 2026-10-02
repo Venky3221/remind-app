@@ -1,0 +1,4 @@
+#Fri Oct 02 03:46:44 UTC 2026
+base.0=/home/ch_venkatesh9966/remind-app/android-app/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

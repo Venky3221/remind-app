@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#4438b8">
+<link rel="manifest" href="/manifest.json">
+<title>Remind Quiz</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#f5f3ff,#eef5ff);color:#202124}
+header{background:linear-gradient(135deg,#4438b8,#6d5dfc);color:white;padding:22px;text-align:center;font-size:30px;font-weight:800;letter-spacing:.5px;box-shadow:0 4px 18px #c9c5e8}
+.container{max-width:680px;margin:28px auto;padding:14px}
+.card{background:rgba(255,255,255,.96);padding:26px;border-radius:26px;box-shadow:0 10px 35px rgba(68,56,184,.14);border:1px solid #eee}
+h1{text-align:center;margin-top:4px;color:#4438b8}
+h2{color:#4438b8}
+.category,.option,.next,.restart{display:block;width:100%;padding:16px;margin:13px 0;border-radius:15px;font-size:17px;font-weight:600;transition:.2s}
+.category,.option{border:1px solid #e2e0ed;background:#fff;color:#303030;text-align:left;box-shadow:0 3px 10px rgba(0,0,0,.04)}
+.category:hover,.option:hover{transform:translateY(-2px);background:#f5f3ff;border-color:#bcb5ff}
+.next,.restart{border:0;background:linear-gradient(135deg,#4438b8,#6d5dfc);color:white;font-weight:700;box-shadow:0 5px 15px rgba(68,56,184,.25)}
+.next:hover,.restart:hover{transform:translateY(-2px)}
+.daily{background:linear-gradient(135deg,#ff7a00,#ff9d2e);color:white;border:0;text-align:center}
+.question{font-size:21px;font-weight:700;line-height:1.45;margin:25px 0}
+.timer{float:right;background:#f0efff;color:#4438b8;padding:9px 13px;border-radius:12px;font-weight:800}
+#result{margin-top:18px;padding:14px;border-radius:14px;background:#f5f3ff;font-size:18px;font-weight:700;text-align:center}
+.date{text-align:center;color:#777;margin-bottom:10px}
+p{line-height:1.5}
+@media(max-width:600px){header{font-size:26px;padding:18px}.container{margin:15px auto;padding:10px}.card{padding:20px;border-radius:22px}.question{font-size:19px}}
+</style>
+</head>
+
+<body>
+<header>Remind</header>
+
+<div class="container">
+<div class="card">
+<div id="app"></div>
+</div>
+</div>
+
+<script>
+
+const quizFiles={
+  National:'national.json',
+  International:'international.json',
+  Daily:'daily.json',
+  Weekly:'weekly.json',
+  Monthly:'monthly.json'
+};
+
+const dailyQuizzes={
+
+"2026-10-01":[
+{q:"Which ISRO mission successfully placed EOS-05 into orbit on September 4, 2026?",o:["GSLV-F17","PSLV-C62","LVM3-M6","GSLV-F16"],a:0},
+{q:"Which country will host the inaugural ICC Women's Champions Trophy in 2027?",o:["National","Australia","England","South Africa"],a:0},
+{q:"What was National's gross GST collection in September 2026?",o:["₹1.77 lakh crore","₹2.03 lakh crore","₹1.50 lakh crore","₹2.50 lakh crore"],a:1},
+{q:"Which organization is National's national space agency?",o:["NASA","ISRO","ESA","JAXA"],a:1},
+{q:"Which planet is known as the Red Planet?",o:["Earth","Venus","Mars","Jupiter"],a:2}
+],
+
+"2026-10-02":[
+{q:"Which two Nationaln cities will host the ICC Women's Champions Trophy 2027?",o:["Delhi and Mumbai","Mumbai and Vadodara","Chennai and Bengaluru","Hyderabad and Kolkata"],a:1},
+{q:"What does GDP stand for?",o:["Gross Domestic Product","Global Development Plan","General Domestic Price","Gross Development Policy"],a:0},
+{q:"Which organization is National's central bank?",o:["SBI","RBI","SEBI","NITI Aayog"],a:1},
+{q:"Which sport uses a shuttlecock?",o:["Tennis","Badminton","Hockey","Football"],a:1},
+{q:"Which is the largest ocean in the world?",o:["Atlantic Ocean","Nationaln Ocean","Pacific Ocean","Arctic Ocean"],a:2}
+],
+
+"2026-10-03":[
+{q:"Which mission was launched by ISRO on September 4, 2026?",o:["GSLV-F17 / EOS-05","PSLV-C62 / EOS-N1","GSLV-F16 / NISAR","LVM3-M6"],a:0},
+{q:"Which country will host the ICC Women's Champions Trophy 2027?",o:["National","Sri Lanka","Bangladesh","Pakistan"],a:0},
+{q:"How many players are on the field for one cricket team?",o:["9","10","11","12"],a:2},
+{q:"What gas do humans need to breathe?",o:["Oxygen","Helium","Hydrogen","Carbon dioxide"],a:0},
+{q:"What does GDP stand for?",o:["Gross Domestic Product","General Domestic Price","Global Development Plan","Gross Development Policy"],a:0}
+]
+
+};
+
+let category="";
+let questions=[];
+let current=0;
+let score=0;
+let answered=false;
+let timer;
+let timeLeft=45;
+
+function localDate(){
+const d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+async function startDailyQuiz(){
+try{
+const response=await fetch('/daily-quiz.json?'+Date.now());
+const data=await response.json();
+
+questions=data.questions;
+category="🔥 "+data.title;
+current=0;
+score=0;
+showQuestion();
+
+}catch(error){
+document.getElementById("app").innerHTML=
+"<h2>Daily Quiz unavailable</h2>"+
+"<p>Please try again later.</p>"+
+"<button class='restart' onclick='showCategories()'>Back</button>";
+}
+}
+
+function showCategories(){
+
+document.getElementById("app").innerHTML=
+"<h1>National Quiz</h1>"+
+"<p>Select a category:</p>"+
+"<button class='category daily' onclick='startDailyQuiz()'>🔥 Daily Quiz</button>"+
+Object.keys(quizFiles).map(c=>
+"<button class='category' onclick=\"startQuiz('"+c+"')\">📚 "+c+"</button>"
+).join("");
+}
+
+async function startQuiz(c){
+  try{
+    const response=await fetch('/'+quizFiles[c]+'?'+Date.now());
+    const data=await response.json();
+    questions=data.questions||[];
+    category=c;
+    current=0;
+    score=0;
+    showQuestion();
+  }catch(error){
+    document.getElementById('app').innerHTML=
+      '<h2>Quiz unavailable</h2><p>Please try again later.</p><button class="restart" onclick="showCategories()">Back</button>';
+  }
+}
+
+function showQuestion(){
+
+answered=false;
+timeLeft=45;
+clearInterval(timer);
+
+const q=questions[current];
+
+let html=
+"<div class='timer'>⏱️ <span id='time'>45</span>s</div>";
+
+html+="<h2>"+category+"</h2>";
+
+if(category==="🔥 Daily Quiz"){
+html+="<div class='date'>Today's Quiz: "+localDate()+"</div>";
+}
+
+html+="<div class='question'>"+(current+1)+". "+q.q+"</div>";
+
+q.o.forEach((x,i)=>
+html+="<button class='option' onclick='checkAnswer("+i+")'>"+x+"</button>"
+);
+
+html+="<button class='next' onclick='nextQuestion()'>Next Question</button>";
+
+document.getElementById("app").innerHTML=html;
+
+timer=setInterval(()=>{
+timeLeft--;
+
+const t=document.getElementById("time");
+if(t)t.textContent=timeLeft;
+
+if(timeLeft<=0){
+clearInterval(timer);
+answered=true;
+nextQuestion();
+}
+
+},1000);
+
+}
+
+function checkAnswer(i){
+
+if(answered)return;
+
+answered=true;
+clearInterval(timer);
+
+if(i===questions[current].a){
+
+score++;
+
+document.getElementById("app")
+.insertAdjacentHTML("beforeend",
+"<div id='result'>✅ Correct!</div>");
+
+}else{
+
+document.getElementById("app")
+.insertAdjacentHTML("beforeend",
+"<div id='result'>❌ Wrong answer.</div>");
+
+}
+
+}
+
+function nextQuestion(){
+
+if(!answered)return;
+
+if(current<questions.length-1){
+
+current++;
+showQuestion();
+
+}else{
+
+clearInterval(timer);
+
+document.getElementById("app").innerHTML=
+"<h1>🎉 Quiz Completed!</h1>"+
+"<h2>"+category+"</h2>"+
+"<p>Your score: <b>"+score+" / "+questions.length+"</b></p>"+
+"<button class='restart' onclick='showCategories()'>Choose Another Quiz</button>";
+
+}
+
+}
+
+showCategories();
+
+</script>
+</body>
+</html>

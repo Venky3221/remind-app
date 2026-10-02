@@ -1,0 +1,55 @@
+{
+  "title": "International Current Affairs",
+  "questions": [
+    {
+      "q": "Which country's Attorney General Roger Mariaca was reported arrested in a Reuters world-news summary on October 2, 2026?",
+      "o": [
+        "Bolivia",
+        "Peru",
+        "Chile",
+        "Ecuador"
+      ],
+      "a": 0
+    },
+    {
+      "q": "A teachers' strike reported on October 2, 2026 disrupted the start of the school year in which country?",
+      "o": [
+        "Libya",
+        "Egypt",
+        "Jordan",
+        "Tunisia"
+      ],
+      "a": 0
+    },
+    {
+      "q": "Which country launched a government disaster insurance scheme on October 1, 2026?",
+      "o": [
+        "Thailand",
+        "Vietnam",
+        "Malaysia",
+        "Indonesia"
+      ],
+      "a": 0
+    },
+    {
+      "q": "Which country was the subject of a Reuters report about President Vladimir Putin's remarks on continuing international conflicts?",
+      "o": [
+        "Russia",
+        "Ukraine",
+        "Belarus",
+        "Kazakhstan"
+      ],
+      "a": 0
+    },
+    {
+      "q": "The EU agenda for September 28\u2013October 3, 2026 included discussions on the 2028\u20132034 Erasmus+ programme. Which institution's members were involved?",
+      "o": [
+        "European Parliament",
+        "UN Security Council",
+        "NATO Parliamentary Assembly",
+        "ASEAN Secretariat"
+      ],
+      "a": 0
+    }
+  ]
+}

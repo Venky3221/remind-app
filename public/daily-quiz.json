@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-02",
+  "title": "Today's Daily Current Affairs",
+  "questions": [
+    {
+      "q": "What was India's gross GST collection in September 2026?",
+      "o": [
+        "\u20b91.77 lakh crore",
+        "\u20b92.04 lakh crore",
+        "\u20b91.52 lakh crore",
+        "\u20b92.50 lakh crore"
+      ],
+      "a": 1
+    },
+    {
+      "q": "Which team will India face in the Asian Games 2026 men's T20 cricket gold-medal match?",
+      "o": [
+        "Sri Lanka",
+        "Bangladesh",
+        "Pakistan",
+        "Australia"
+      ],
+      "a": 2
+    },
+    {
+      "q": "Which Ahmedabad-based Indian startup launched the TAPAS-1 thermal payload on SpaceX's Falcon 9 Transporter-18 mission?",
+      "o": [
+        "Dhruva Space",
+        "SatLeo Labs",
+        "TakeMe2Space",
+        "Skyroot Aerospace"
+      ],
+      "a": 1
+    },
+    {
+      "q": "What is TakeMe2Space's MOI-1A described as?",
+      "o": [
+        "India's first orbital computing satellite",
+        "India's first weather satellite",
+        "India's first navigation satellite",
+        "India's first lunar rover"
+      ],
+      "a": 0
+    },
+    {
+      "q": "What was India's Manufacturing PMI in September 2026?",
+      "o": [
+        "49.8",
+        "52.8",
+        "55.1",
+        "58.4"
+      ],
+      "a": 2
+    }
+  ]
+}

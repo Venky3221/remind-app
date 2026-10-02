@@ -1,0 +1,55 @@
+{
+  "title": "Daily Current Affairs",
+  "questions": [
+    {
+      "q": "India's gross GST collection for September 2026 rose year-on-year by:",
+      "o": [
+        "8.4%",
+        "11.6%",
+        "14.7%",
+        "18.1%"
+      ],
+      "a": 2
+    },
+    {
+      "q": "What was India's net GST revenue after refunds in September 2026?",
+      "o": [
+        "\u20b91.38 lakh crore",
+        "\u20b91.77 lakh crore",
+        "\u20b92.04 lakh crore",
+        "\u20b92.46 lakh crore"
+      ],
+      "a": 1
+    },
+    {
+      "q": "What is MOI-1A described as?",
+      "o": [
+        "India's first orbital computing satellite",
+        "India's first navigation satellite",
+        "India's first weather satellite",
+        "India's first lunar rover"
+      ],
+      "a": 0
+    },
+    {
+      "q": "India's September 2026 Manufacturing PMI reached a seven-month high of:",
+      "o": [
+        "52.8",
+        "54.7",
+        "55.1",
+        "56.9"
+      ],
+      "a": 2
+    },
+    {
+      "q": "On which date was the latest Daily Current Affairs set prepared?",
+      "o": [
+        "30 September 2026",
+        "1 October 2026",
+        "2 October 2026",
+        "3 October 2026"
+      ],
+      "a": 2
+    }
+  ]
+}

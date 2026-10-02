@@ -1,0 +1,55 @@
+{
+  "title": "Monthly Current Affairs",
+  "questions": [
+    {
+      "q": "During April\u2013September 2026, India's gross GST collections reached approximately:",
+      "o": [
+        "\u20b98.46 lakh crore",
+        "\u20b910.66 lakh crore",
+        "\u20b912.46 lakh crore",
+        "\u20b915.20 lakh crore"
+      ],
+      "a": 2
+    },
+    {
+      "q": "What was India's gross GST collection in September 2026?",
+      "o": [
+        "\u20b91.76 lakh crore",
+        "\u20b92.04 lakh crore",
+        "\u20b92.43 lakh crore",
+        "\u20b92.11 lakh crore"
+      ],
+      "a": 1
+    },
+    {
+      "q": "What was India's Manufacturing PMI in August 2026?",
+      "o": [
+        "49.8",
+        "52.8",
+        "55.1",
+        "56.9"
+      ],
+      "a": 1
+    },
+    {
+      "q": "Which company is developing the MOI-1A orbital computing satellite?",
+      "o": [
+        "TakeMe2Space",
+        "Dhruva Space",
+        "Skyroot Aerospace",
+        "Bellatrix Aerospace"
+      ],
+      "a": 0
+    },
+    {
+      "q": "What was the September 2026 HSBC India Manufacturing PMI compared with August?",
+      "o": [
+        "It fell from 55.1 to 52.8",
+        "It rose from 52.8 to 55.1",
+        "It stayed unchanged at 52.8",
+        "It rose from 55.1 to 56.9"
+      ],
+      "a": 1
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "title": "National Current Affairs",
+  "questions": [
+    {
+      "q": "India's gross GST collection in September 2026 was approximately:",
+      "o": [
+        "\u20b91.77 lakh crore",
+        "\u20b92.04 lakh crore",
+        "\u20b91.52 lakh crore",
+        "\u20b92.50 lakh crore"
+      ],
+      "a": 1
+    },
+    {
+      "q": "India's Manufacturing PMI for September 2026 was:",
+      "o": [
+        "49.8",
+        "52.8",
+        "55.1",
+        "58.4"
+      ],
+      "a": 2
+    },
+    {
+      "q": "Which state recorded the highest GST collection among states in September 2026?",
+      "o": [
+        "Karnataka",
+        "Gujarat",
+        "Maharashtra",
+        "Uttar Pradesh"
+      ],
+      "a": 2
+    },
+    {
+      "q": "India's first orbital computing satellite, MOI-1A, is associated with which startup?",
+      "o": [
+        "TakeMe2Space",
+        "Skyroot Aerospace",
+        "Dhruva Space",
+        "Agnikul Cosmos"
+      ],
+      "a": 0
+    },
+    {
+      "q": "The final HSBC India Manufacturing PMI for September 2026 rose from August's 52.8 to:",
+      "o": [
+        "53.5",
+        "54.2",
+        "55.1",
+        "56.9"
+      ],
+      "a": 2
+    }
+  ]
+}
