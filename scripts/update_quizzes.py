@@ -97,7 +97,6 @@ def ask_gemini(category, articles):
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not available")
 
-
     article_text = []
 
     for i, article in enumerate(articles, 1):
@@ -128,7 +127,7 @@ Instead ask factual questions about people, places, organizations, events,
 dates, decisions, numbers, agreements, discoveries, appointments or other
 specific information actually stated in the articles.
 
-Each question must have exactly 4 options and exactly 1 correct answer.
+Each question must have exactly 5 options and exactly 1 correct answer.
 
 Return ONLY valid JSON in this exact structure:
 
@@ -136,7 +135,13 @@ Return ONLY valid JSON in this exact structure:
   "questions": [
     {{
       "q": "Question text",
-      "o": ["Option 1", "Option 2", "Option 3", "Option 4"],
+      "o": [
+        "Option 1",
+        "Option 2",
+        "Option 3",
+        "Option 4",
+        "Option 5"
+      ],
       "a": 0,
       "explanation": "Brief explanation based only on the article.",
       "source": "Article URL"
@@ -145,7 +150,7 @@ Return ONLY valid JSON in this exact structure:
 }}
 
 Rules:
-- "a" must be 0, 1, 2, or 3.
+- "a" must be 0, 1, 2, 3, or 4.
 - The correct option must be factually supported by the supplied article.
 - Wrong options must be plausible but incorrect.
 - Avoid yes/no questions.
@@ -159,7 +164,6 @@ Articles:
 
 {"".join(article_text)}
 """
-
 
     endpoint = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
@@ -217,13 +221,16 @@ Articles:
         if not isinstance(question, str):
             continue
 
-        if not isinstance(options, list) or len(options) != 4:
+        if not isinstance(options, list) or len(options) != 5:
             continue
 
-        if not isinstance(answer, int) or answer not in [0, 1, 2, 3]:
+        if not isinstance(answer, int) or answer not in [0, 1, 2, 3, 4]:
             continue
 
-        if not all(isinstance(x, str) and x.strip() for x in options):
+        if not all(
+            isinstance(x, str) and x.strip()
+            for x in options
+        ):
             continue
 
         if not isinstance(explanation, str):
@@ -240,7 +247,7 @@ Articles:
             "source": source
         })
 
-    if len(valid) < 20:
+    if len(valid) < 5:
         raise RuntimeError(
             f"Gemini returned only {len(valid)} valid questions"
         )
@@ -264,6 +271,7 @@ def unique_news(items):
 
 today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+
 categories = {
     "national.json": (
         "National Current Affairs",
@@ -283,7 +291,7 @@ categories = {
     ),
     "monthly.json": (
         "Monthly Current Affairs",
-        "India world major news July 2026"
+        "India world major news October 2026"
     )
 }
 
@@ -316,14 +324,23 @@ for filename, (title, query) in categories.items():
             "questions": questions
         }
 
-        with open("public/" + filename, "w") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
+        with open(
+            "public/" + filename,
+            "w",
+            encoding="utf-8"
+        ) as f:
+            json.dump(
+                data,
+                f,
+                indent=2,
+                ensure_ascii=False
+            )
 
         print(
             filename,
             "updated with",
             len(questions),
-            "real MCQs"
+            "real 5-option MCQs"
         )
 
     except Exception as e:
