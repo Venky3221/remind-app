@@ -1,0 +1,11 @@
+{
+  "name": "remind-functions",
+  "description": "REMIND AI MCQ generator",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-functions": "^6.0.1"
+  }
+}
